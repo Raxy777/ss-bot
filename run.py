@@ -46,10 +46,8 @@ def run_telegram_bot():
     """Run the Telegram bot"""
     print("🤖 Starting Telegram bot...")
     try:
-        # Wait for Flask to start
+        import time
         time.sleep(3)
-        
-        # Test API connection
         import requests
         try:
             response = requests.get('http://localhost:5000/api/health', timeout=5)
@@ -59,10 +57,15 @@ def run_telegram_bot():
                 print("⚠️ Flask API is running but returned unexpected status")
         except requests.exceptions.RequestException:
             print("⚠️ Could not connect to Flask API, but continuing with bot startup...")
-        
-        # Start Telegram bot
+
+        # --- FIX: Set up event loop for this thread ---
+        import asyncio
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        # Now import and run the bot
         from telegram_bot import main
         main()
+        # ---------------------------------------------
     except Exception as e:
         print(f"❌ Error starting Telegram bot: {e}")
         sys.exit(1)
